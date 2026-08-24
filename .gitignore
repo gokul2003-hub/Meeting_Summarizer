@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+backend/__pycache__/
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+*.pyc
+__pycache__/
+.pytest_cache/
+
+# Environment & Credentials
+.env
+*.pem
+*.key
+
+# Database & Storage
+meetings.db
+backend/meetings.db
+uploads/
+backend/uploads/
+output/
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ summary.metadata.title }} — Meeting Report</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            color: #1a1a2e;
+            line-height: 1.6;
+            margin: 40px 50px;
+            font-size: 14px;
+        }
+
+        /* Header */
+        .header {
+            border-bottom: 3px solid #0f3460;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 28px;
+            color: #16213e;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .meta {
+            color: #555;
+            font-size: 13px;
+        }
+        .meta span {
+            margin-right: 20px;
+        }
+
+        /* Sections */
+        h2 {
+            color: #0f3460;
+            font-size: 20px;
+            margin-top: 35px;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        p { margin-bottom: 12px; }
+
+        /* Summary box */
+        .summary-box {
+            background: linear-gradient(135deg, #f0f4ff, #e8f0fe);
+            border-left: 4px solid #0f3460;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+        th {
+            background: #0f3460;
+            color: #ffffff;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        tr:nth-child(even) { background: #f8f9fc; }
+        tr:hover { background: #eef2ff; }
+
+        /* Priority badges */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-high { background: #ffe0e0; color: #c0392b; }
+        .badge-medium { background: #fff8e1; color: #e67e22; }
+        .badge-low { background: #e8f5e9; color: #27ae60; }
+
+        /* Topics list */
+        .topics-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .topic-tag {
+            background: #e8f0fe;
+            color: #0f3460;
+            padding: 5px 14px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 50px;
+            padding-top: 15px;
+            border-top: 2px solid #e0e0e0;
+            color: #888;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        @media print {
+            body { margin: 20px; }
+            .header { page-break-after: avoid; }
+            table { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>📋 {{ summary.metadata.title }}</h1>
+        <div class="meta">
+            <span><strong>Date:</strong> {{ summary.metadata.date }}</span>
+            <span><strong>Participants:</strong> {{ summary.metadata.participants | join(', ') or 'N/A' }}</span>
+            {% if summary.metadata.duration_minutes %}
+            <span><strong>Duration:</strong> {{ summary.metadata.duration_minutes }} min</span>
+            {% endif %}
+            <span><strong>Sentiment:</strong> {{ summary.sentiment | capitalize }}</span>
+        </div>
+    </div>
+
+    <!-- Executive Summary -->
+    <h2>📝 Executive Summary</h2>
+    <div class="summary-box">
+        <p>{{ summary.executive_summary }}</p>
+    </div>
+
+    <!-- Key Topics -->
+    {% if summary.key_topics %}
+    <h2>🎯 Key Topics</h2>
+    <div class="topics-list">
+        {% for topic in summary.key_topics %}
+        <span class="topic-tag">{{ topic }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Detailed Summary -->
+    {% if summary.detailed_summary %}
+    <h2>📖 Detailed Summary</h2>
+    <p>{{ summary.detailed_summary }}</p>
+    {% endif %}
+
+    <!-- Key Decisions -->
+    {% if summary.key_decisions %}
+    <h2>✅ Key Decisions</h2>
+    <table>
+        <thead><tr><th>#</th><th>Decision</th><th>Made By</th></tr></thead>
+        <tbody>
+        {% for dec in summary.key_decisions %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ dec.decision if dec.decision is defined else dec.get('decision', '') }}</td>
+            <td>{{ dec.made_by if dec.made_by is defined else dec.get('made_by', '') }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <!-- Action Items -->
+    {% if summary.action_items %}
+    <h2>🚀 Action Items</h2>
+    <table>
+        <thead>
+            <tr><th>#</th><th>Task</th><th>Owner</th><th>Priority</th><th>Due Date</th></tr>
+        </thead>
+        <tbody>
+        {% for action in summary.action_items %}
+        <tr>
+            <td>{{ action.id }}</td>
+            <td>{{ action.task }}</td>
+            <td>{{ action.owner }}</td>
+            <td>
+                {% if action.priority.value == 'high' %}
+                <span class="badge badge-high">HIGH</span>
+                {% elif action.priority.value == 'medium' %}
+                <span class="badge badge-medium">MEDIUM</span>
+                {% else %}
+                <span class="badge badge-low">LOW</span>
+                {% endif %}
+            </td>
+            <td>{{ action.due_date or '—' }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <!-- Speaker Contributions -->
+    {% if summary.speakers %}
+    <h2>👥 Speaker Contributions</h2>
+    {% for speaker in summary.speakers %}
+    <h3 style="color:#0f3460; margin-top:15px;">
+        {{ speaker.name if speaker.name is defined else speaker.get('name', '') }}
+    </h3>
+    <ul>
+        {% set points = speaker.key_points if speaker.key_points is defined else speaker.get('key_points', []) %}
+        {% for point in points %}
+        <li>{{ point }}</li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+    {% endif %}
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>Generated by <strong>AI Meeting Notes Summarizer</strong> | {{ summary.processed_at }}</p>
+    </div>
+
+</body>
+</html>

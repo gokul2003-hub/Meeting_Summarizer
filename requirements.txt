@@ -1,0 +1,18 @@
+# Unified AI Meeting Intelligence Suite Requirements
+fastapi>=0.110.0
+uvicorn[standard]>=0.28.0
+sqlalchemy>=2.0.0
+alembic>=1.13.0
+pydantic>=2.6.0
+pydantic-settings>=2.2.0
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+python-multipart>=0.0.9
+openai>=1.14.0
+openai-whisper>=20231117
+rich>=13.7.0
+jinja2>=3.1.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+pytest>=8.0.0
+pytest-cov>=4.1.0
